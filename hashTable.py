@@ -55,4 +55,3 @@ class HashTable:
     def print(self):
         print(self.table)
 
-
