@@ -1,5 +1,5 @@
 class HashTable:
-    def __init__(self, capacity=3):
+    def __init__(self, capacity=10):
     # Initializes the hash table with the given capacity.
         self.capacity = capacity
         self.table = [None] * capacity
