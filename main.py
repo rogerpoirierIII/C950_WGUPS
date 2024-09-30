@@ -1,5 +1,7 @@
 # Roger Poirier ID: 011110021
-from dis import disco
+from dis import disco, distb
+from msilib import add_tables
+from os import remove
 from struct import pack_into
 from traceback import print_list
 
@@ -10,7 +12,7 @@ from package import Package
 from truck import Truck
 import csv
 
-def generate_package_Hash_Table(file):
+def generate_package_hash_table(file):
     hash_table = HashTable()
     # Reads packages csv file
     with open(file) as data:
@@ -23,7 +25,7 @@ def generate_package_Hash_Table(file):
         return hash_table
 
 def generate_address_list():
-    address_list = ['HUB']
+    address_list = []
     with open("distances.csv") as data:
         reader = csv.reader(data)
         next(reader)
@@ -35,6 +37,7 @@ def generate_address_list():
                 address_list.append(row)
 
     return address_list
+
 def generate_distance_list():
     distance_list = list()
     with open("distances.csv") as data:
@@ -51,41 +54,37 @@ def get_distance_between(location1,location2):
     return float(distance)
 
 def map_address(address):
-    for index in range(address_list.__len__()):
+    for index in range(len(address_list)):
         if address_list.__contains__(address):
             return address_list.index(address)
 
 def plot_route(truck):
-
-    route_list = []
     travel_list = []
     unvisited_address =[]
     for package in truck.packages:
          if package_table.lookup(str(package)) is not None:
             unvisited_address.append(package_table.lookup(str(package)))
+    truck.packages.clear()
     while len(unvisited_address) != 0:
-        curr_loc = 'HUB'
+        curr_loc = '4001 South 700 East'
         next_loc = None
         min_distance = float('inf')
-        for i in range(len(unvisited_address)):
-            selected_address = unvisited_address[i]
-
-            if curr_loc =='HUB':
-                distance = (get_distance_between(0,map_address(selected_address.address)))
-            else:
-                distance = get_distance_between(map_address(curr_loc),map_address(selected_address.address))
-
-            if distance < min_distance:
+        for package in unvisited_address:
+            distance = get_distance_between(map_address(curr_loc),map_address(package.address))
+            if distance <= min_distance:
                 min_distance = distance
-                next_loc = selected_address
-
-        route_list.append(next_loc.id)
+                next_loc = package
+        truck.packages.append(next_loc.id)
         travel_list.append(min_distance)
         unvisited_address.remove(next_loc)
         curr_loc = next_loc
-    print(route_list)
+        for package in unvisited_address:
+            if package.address == curr_loc.address:
+                truck.packages.append(package.id)
+                unvisited_address.remove(package)
+        truck.miles = sum(travel_list)
     print(travel_list)
-package_table = generate_package_Hash_Table("packages.csv")
+package_table = generate_package_hash_table("packages.csv")
 address_list = generate_address_list()
 distance_list = generate_distance_list()
 truck1 = Truck(1)
@@ -99,3 +98,15 @@ truck3.packages =[1, 5, 7, 8, 24, 29, 30, 37]
 plot_route(truck1)
 plot_route(truck2)
 plot_route(truck3)
+
+total_miles = truck1.miles + truck2.miles + truck3.miles
+
+print('Truck\'s sorted package list:')
+print("Truck 1")
+print(truck1.packages)
+print("Truck 2")
+print(truck2.packages)
+print('Truck 3')
+print(truck3.packages)
+print()
+print("Total Miles: " + str(total_miles))
