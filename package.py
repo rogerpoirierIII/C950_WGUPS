@@ -14,9 +14,7 @@ class Package:
         self.special_note = special_note
         self.status = status
         self.delivery_time = delivery_time
-    # def __str__(self):
-    #     return "%s, %s, %s, %s, %s, %s, %s" % (
-    #         self.id, self.address, self.city, self.state, self.zip, self.deadline, self.weight,
+    # Function sets takes the user input time and the truck's departure time and updates the status of the package
     def set_status(self,input_time,departure_time):
         if input_time < departure_time:
             self.status ="At Hub"
