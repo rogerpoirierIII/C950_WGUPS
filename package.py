@@ -14,10 +14,18 @@ class Package:
         self.special_note = special_note
         self.status = status
         self.delivery_time = delivery_time
-    # def __str__(self):
-    #     return "%s, %s, %s, %s, %s, %s, %s" % (
-    #         self.id, self.address, self.city, self.state, self.zip, self.deadline, self.weight,
+    # Function sets takes the user input time and the truck's departure time and updates the status of the package
     def set_status(self,input_time,departure_time):
+        # Hardcoded solution for package 9 which has the wrong address listed.
+        if self.id == 9:
+            change_time = timedelta(hours=10, minutes=20)
+            # If the users input time is the same or after 10:20am, package 9's address changes to the correct address
+            if input_time >= change_time:
+                self.address = '410 S State St'
+                self.city = 'Salt Lake City'
+                self.state = 'UT'
+                self.zip = '84111'
+
         if input_time < departure_time:
             self.status ="At Hub"
         elif self.delivery_time < input_time:
