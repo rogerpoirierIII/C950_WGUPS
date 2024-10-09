@@ -1,14 +1,5 @@
 # Roger Poirier ID: 011110021
 from datetime import timedelta
-from dis import disco, distb
-from msilib import add_tables
-from os import remove
-from struct import pack_into
-from time import process_time_ns
-from traceback import print_list
-
-from select import select
-
 from hashTable import HashTable
 from package import Package
 from truck import Truck
@@ -85,7 +76,7 @@ def plot_route(truck):
     unvisited_address =[]
     # Takes a package object corresponding to the package ID in the truck's packages list and copies it to the unvisited list
     for package in truck.packages:
-         if package_table.lookup(str(package)) is not None:
+        if package_table.lookup(str(package)) is not None:
             unvisited_address.append(package_table.lookup(str(package)))
     # Clears the trucks current packages list so the ordered list can be added later
     truck.packages.clear()
@@ -108,9 +99,11 @@ def plot_route(truck):
         next_package.delivery_time = truck.departure_time + truck.travel_time
         # If the package is delivered on time, the package is given a status. If delivered late, the package status is updated to reflect it being late
         if next_package.delivery_time < next_package.deadline:
-            next_package.status = f"Delivered at {next_package.delivery_time} - Address {package.address} - Truck: {truck.name} "
+            next_package.status = f"Delivered at {truck.departure_time + truck.travel_time} - Address: {next_package.address} - Truck: {truck.name} "
+            next_package.delivery_message = next_package.status
         else:
-            next_package.status = f"LATE, Delivered: {truck.departure_time + truck.travel_time} - Address {package.address} - Truck: {truck.name}"
+            next_package.status = f"LATE, Delivered: {truck.departure_time + truck.travel_time} - Address {next_package.address} - Truck: {truck.name}"
+            next_package.delivery_message = next_package.status
         # Adds the packages back to the truck object's packages list
         truck.packages.append(next_package.id)
         # Removes the package from the unvisited list
@@ -123,8 +116,10 @@ def plot_route(truck):
                 # Sets the status of the package the same way as before from LINES 110 - 113
                 if truck.departure_time + route_time < package.deadline:
                     package.status = f"Delivered at {truck.departure_time + route_time } - Address: {package.address} - Truck: {truck.name}"
+                    package.delivery_message = package.status
                 else:
                     package.status = f"LATE, Delivered: {truck.departure_time + truck.travel_time} Address: {package.address} Truck: {truck.name}"
+                    package.delivery_message = package.status
                 #Adds the package with the same address to the truck list and then also removes it from the unvisited list.
                 truck.packages.append(package.id)
                 unvisited_address.remove(package)
@@ -177,10 +172,12 @@ truck2.packages =[2,3,7,9,10,11,17,18,22,23,24,33,36,38]
 truck3.packages =[5,6,8,12,25,26,27,28,31,32,35,37]
 
 # Since package 9 is at the hub on Truck 2 until 12:00, address is updated before truck 2's route is plot
-package_table.lookup('9').address = '410 S State St'
-package_table.lookup('9').city = 'Salt Lake City'
-package_table.lookup('9').state = 'UT'
-package_table.lookup('9').zip = '84111'
+for i in range(1, len(package_table.table) // 2):
+    if package_table.lookup(str(i)).id == "9":
+        package_table.lookup('9').address = '410 S State St'
+        package_table.lookup('9').city = 'Salt Lake City'
+        package_table.lookup('9').state = 'UT'
+        package_table.lookup('9').zip = '84111'
 
 plot_route(truck1)
 plot_route(truck2)
@@ -190,10 +187,8 @@ total_miles = truck1.miles + truck2.miles + truck3.miles
 
 class Main:
     print("WGUPS")
-    print()
     print(f"Total Miles Driven: {total_miles}")
     while True:
-        print()
         print("Please Enter a time in HH:MM format, or type \'q\' to quit ")
         choice = input()
         if choice.lower() == 'q':
